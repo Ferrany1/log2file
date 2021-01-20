@@ -2,10 +2,12 @@ package log2file
 
 import (
 	"github.com/Ferrany1/log2file/src/directory"
+	"io/ioutil"
 	"log"
 	"os"
 	"path"
 	"reflect"
+	"time"
 )
 
 // Standard names for log files
@@ -75,6 +77,11 @@ func (c *fileOptions) createLogFile() (string, error) {
 		}
 	}
 	_, err = os.Create(mainPath)
+	if err != nil {
+		return "", err
+	}
+
+	err = ioutil.WriteFile(mainPath, []byte(time.Now().Format(time.RFC3339)+" Started log.\n"), 0644)
 	if err != nil {
 		return "", err
 	}
