@@ -5,9 +5,9 @@ import (
 	"log"
 )
 
-func ExampleEmptyConfig() {
-	// Inits new logfile config
-	li := log2file.NewOptions()
+func ExampleEmptyOptions() {
+	// Gets standard logfile Options
+	li := log2file.GetOptions()
 	// Inits logfile in current dict
 	logger, err := li.Logger()
 	if err != nil {

@@ -17,6 +17,6 @@ import (
 
 
 
-## Examples: 
+## Examples:
 1. [Empty Options](/examples/example1/example1_empty.go)
 2. [Custom Options](/examples/example2/example2_custom.go)

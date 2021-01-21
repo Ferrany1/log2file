@@ -1,6 +1,5 @@
 package example2
 
-
 import (
 	"github.com/Ferrany1/log2file/src/directory"
 	"io/ioutil"
@@ -9,14 +8,14 @@ import (
 	"testing"
 )
 
-func TestExampleCustomConfig(t *testing.T) {
+func TestExampleCustomOptions(t *testing.T) {
 	var (
 		mFileName = map[string]bool{"log_main.log": false, "log_backup.log": false}
 		logText   = "test"
 	)
 
 	for i := 0; i < 2; i++ {
-		ExampleCustomConfig()
+		ExampleCustomOptions()
 	}
 
 	fi, dir, err := directory.ReadCurrentDirectory()

@@ -1,6 +1,5 @@
 package example1
 
-
 import (
 	"github.com/Ferrany1/log2file/src/directory"
 	"io/ioutil"
@@ -9,14 +8,14 @@ import (
 	"testing"
 )
 
-func TestExampleEmptyConfig(t *testing.T) {
+func TestExampleEmptyOptions(t *testing.T) {
 	var (
 		mFileName = map[string]bool{"log_1.log": false, "log_2.log": false}
 		logText   = "test"
 	)
 
 	for i := 0; i < 2; i++ {
-		ExampleEmptyConfig()
+		ExampleEmptyOptions()
 	}
 
 	fi, dir, err := directory.ReadCurrentDirectory()

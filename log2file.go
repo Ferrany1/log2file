@@ -12,7 +12,7 @@ import (
 
 // Standard names for log files
 var (
-	standConfig = &fileOptions{fiNames: fileNames{logMain: "log_1", logBackup: "log_2", logExtension: "log"}}
+	standOptions = &fileOptions{fiNames: fileNames{logMain: "log_1", logBackup: "log_2", logExtension: "log"}}
 )
 
 // LogFileOptions struct
@@ -20,20 +20,20 @@ type fileOptions struct {
 	fiNames fileNames
 }
 
-// LogFileConfig Names params
+// LogFileOptions Names params
 type fileNames struct {
 	logMain      string
 	logBackup    string
 	logExtension string
 }
 
-// Creates new LogFileConfig element
-func NewOptions() *fileOptions {
-	return new(fileOptions)
+// Gets new LogFileOptions element
+func GetOptions() *fileOptions {
+	return standOptions
 }
 
-// Changes fileNames for LogFileConfig element
-func (c *fileOptions) ChangeConfigNames(nMainFile, nBackupFile, nExtensionFile string) *fileOptions {
+// Changes fileNames for (logMain, logBackup, logExtension string) LogFileOptions element
+func (c *fileOptions) ChangeOptionsNames(nMainFile, nBackupFile, nExtensionFile string) *fileOptions {
 	c.fiNames = fileNames{logMain: nMainFile, logBackup: nBackupFile, logExtension: nExtensionFile}
 	return c
 }
@@ -41,7 +41,7 @@ func (c *fileOptions) ChangeConfigNames(nMainFile, nBackupFile, nExtensionFile s
 // Logger Instance creation that will write new logs to logMain file
 func (c *fileOptions) Logger() (*log.Logger, error) {
 	if reflect.ValueOf(*c).IsZero() {
-		c = standConfig
+		c = standOptions
 	}
 
 	lPath, err := c.createLogFile()

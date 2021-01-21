@@ -1,16 +1,15 @@
 package example2
 
-
 import (
 	"github.com/Ferrany1/log2file"
 	"log"
 )
 
-func ExampleCustomConfig() {
-	// Inits new logfile config
-	li := log2file.NewOptions()
+func ExampleCustomOptions() {
+	// Gets standard logfile Options
+	li := log2file.GetOptions()
 	// Changes log files names and extension
-	li.ChangeConfigNames("log_main", "log_backup", "log")
+	li.ChangeOptionsNames("log_main", "log_backup", "log")
 	// Inits logfile in current dict
 	logger, err := li.Logger()
 	if err != nil {
