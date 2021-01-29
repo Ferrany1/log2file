@@ -1,23 +1,27 @@
 package log2file
 
 import (
+	"fmt"
 	"github.com/Ferrany1/log2file/src/directory"
+	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"log"
 	"os"
 	"path"
 	"reflect"
+	"strconv"
 	"time"
 )
 
 // Standard names for log files
 var (
-	standOptions = &fileOptions{fiNames: fileNames{logMain: "log_1", logBackup: "log_2", logExtension: "log"}}
+	standOptions = &fileOptions{fiNames: fileNames{logMain: "log_1", logBackup: "log_2", logExtension: "log"}, port: 40013}
 )
 
 // LogFileOptions struct
 type fileOptions struct {
 	fiNames fileNames
+	port    int
 }
 
 // LogFileOptions Names params
@@ -33,8 +37,9 @@ func GetOptions() *fileOptions {
 }
 
 // Changes fileNames for (logMain, logBackup, logExtension string) LogFileOptions element
-func (c *fileOptions) ChangeOptionsNames(nMainFile, nBackupFile, nExtensionFile string) *fileOptions {
+func (c *fileOptions) ChangeOptionsNames(nMainFile, nBackupFile, nExtensionFile string, port int) *fileOptions {
 	c.fiNames = fileNames{logMain: nMainFile, logBackup: nBackupFile, logExtension: nExtensionFile}
+	c.port = port
 	return c
 }
 
@@ -54,6 +59,8 @@ func (c *fileOptions) Logger() (*log.Logger, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	go router()
 
 	return log.New(f, "", log.LstdFlags), nil
 }
@@ -97,4 +104,26 @@ func (c *fileOptions) findLogFile(fi []os.FileInfo) (ok bool) {
 		}
 	}
 	return
+}
+
+// Starts a router with paths to logfiles
+func router() {
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.New()
+
+	r.Group("/logs")
+	r.GET("/log_m", getLog1)
+	r.GET("/log_b", getLog2)
+
+	log.Println(r.Run(":" + strconv.Itoa(standOptions.port)))
+}
+
+// Handler for main log file
+func getLog1(c *gin.Context) {
+	c.File(fmt.Sprintf("./%s.%s", standOptions.fiNames.logMain, standOptions.fiNames.logExtension))
+}
+
+// Handler for backup log file
+func getLog2(c *gin.Context) {
+	c.File(fmt.Sprintf("./%s.%s", standOptions.fiNames.logBackup, standOptions.fiNames.logExtension))
 }
