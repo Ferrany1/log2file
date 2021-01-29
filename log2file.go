@@ -111,9 +111,9 @@ func router() {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 
-	r.Group("/logs")
-	r.GET("/log_m", getLog1)
-	r.GET("/log_b", getLog2)
+	lg := r.Group("/logs")
+	lg.GET("/log_m", getLog1)
+	lg.GET("/log_b", getLog2)
 
 	log.Println(r.Run(":" + strconv.Itoa(standOptions.port)))
 }
