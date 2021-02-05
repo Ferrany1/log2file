@@ -15,13 +15,13 @@ import (
 
 // Standard names for log files
 var (
-	standOptions = &fileOptions{fiNames: fileNames{logMain: "log_1", logBackup: "log_2", logExtension: "log"}, port: 40013}
+	standOptions = &fileOptions{fiNames: fileNames{logMain: "log_1", logBackup: "log_2", logExtension: "log"}, router: logRouter{port: 40013}}
 )
 
 // LogFileOptions struct
 type fileOptions struct {
 	fiNames fileNames
-	port    int
+	router  logRouter
 }
 
 // LogFileOptions Names params
@@ -31,15 +31,20 @@ type fileNames struct {
 	logExtension string
 }
 
+type logRouter struct {
+	port       int
+	workStatus bool
+}
+
 // Gets new LogFileOptions element
 func GetOptions() *fileOptions {
 	return standOptions
 }
 
 // Changes fileNames for (logMain, logBackup, logExtension string) LogFileOptions element
-func (c *fileOptions) ChangeOptionsNames(nMainFile, nBackupFile, nExtensionFile string, port int) *fileOptions {
+func (c *fileOptions) ChangeOptionsNames(nMainFile, nBackupFile, nExtensionFile string, port int, routerStatus bool) *fileOptions {
 	c.fiNames = fileNames{logMain: nMainFile, logBackup: nBackupFile, logExtension: nExtensionFile}
-	c.port = port
+	c.router = logRouter{port: port, workStatus: routerStatus}
 	return c
 }
 
@@ -60,7 +65,9 @@ func (c *fileOptions) Logger() (*log.Logger, error) {
 		return nil, err
 	}
 
-	go router()
+	if c.router.workStatus {
+		go router()
+	}
 
 	return log.New(f, "", log.LstdFlags), nil
 }
@@ -115,7 +122,7 @@ func router() {
 	lg.GET("/log_m", getLog1)
 	lg.GET("/log_b", getLog2)
 
-	log.Println(r.Run(":" + strconv.Itoa(standOptions.port)))
+	log.Println(r.Run(":" + strconv.Itoa(standOptions.router.port)))
 }
 
 // Handler for main log file

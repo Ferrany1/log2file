@@ -9,7 +9,7 @@ func ExampleCustomOptions() {
 	// Gets standard logfile Options
 	li := log2file.GetOptions()
 	// Changes log files names and extension
-	li.ChangeOptionsNames("log_main", "log_backup", "log", 8081)
+	li.ChangeOptionsNames("log_main", "log_backup", "log", 8081, true)
 	// Inits logfile in current dict
 	logger, err := li.Logger()
 	if err != nil {
