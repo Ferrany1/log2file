@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/Ferrany1/log2file/src/directory"
 	"github.com/gin-gonic/gin"
-	"io/ioutil"
+	"io/fs"
 	"log"
 	"os"
 	"path"
@@ -95,7 +95,7 @@ func (c *fileOptions) createLogFile() (string, error) {
 		return "", err
 	}
 
-	err = ioutil.WriteFile(mainPath, []byte(time.Now().Format(time.RFC3339)+" Started log.\n"), 0644)
+	err = os.WriteFile(mainPath, []byte(time.Now().Format(time.RFC3339)+" Started log.\n"), 0644)
 	if err != nil {
 		return "", err
 	}
@@ -104,7 +104,7 @@ func (c *fileOptions) createLogFile() (string, error) {
 }
 
 // Check if mainLog file is in directory
-func (c *fileOptions) findLogFile(fi []os.FileInfo) (ok bool) {
+func (c *fileOptions) findLogFile(fi []fs.DirEntry) (ok bool) {
 	for _, f := range fi {
 		if f.Name() == c.fiNames.logMain+"."+c.fiNames.logExtension {
 			return true

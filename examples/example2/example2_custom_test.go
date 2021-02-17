@@ -2,7 +2,7 @@ package example2
 
 import (
 	"github.com/Ferrany1/log2file/src/directory"
-	"io/ioutil"
+	"os"
 	"path"
 	"strings"
 	"testing"
@@ -27,7 +27,7 @@ func TestExampleCustomOptions(t *testing.T) {
 		if _, ok := mFileName[f.Name()]; ok {
 			mFileName[f.Name()] = true
 
-			b, err := ioutil.ReadFile(path.Join(dir, f.Name()))
+			b, err := os.ReadFile(path.Join(dir, f.Name()))
 			if err != nil {
 				t.Errorf("failed to read file %s: %s", f.Name(), err.Error())
 			}
