@@ -12,35 +12,27 @@ func TestExampleCustomOptions(t *testing.T) {
 	var (
 		mFileName = map[string]bool{"log_main.log": false, "log_backup.log": false}
 		logText   = "test"
+		extraPath = "./testDir"
 	)
 
 	for i := 0; i < 2; i++ {
 		ExampleCustomOptions()
 	}
 
-	fi, dir, err := directory.ReadCurrentDirectory()
+	_, _, err := directory.ReadDirectory(extraPath)
 	if err != nil {
 		t.Errorf("failed to read dir: %s", err.Error())
 	}
 
-	for _, f := range fi {
-		if _, ok := mFileName[f.Name()]; ok {
-			mFileName[f.Name()] = true
-
-			b, err := os.ReadFile(path.Join(dir, f.Name()))
-			if err != nil {
-				t.Errorf("failed to read file %s: %s", f.Name(), err.Error())
-			}
-
-			if !strings.Contains(string(b), logText) {
-				t.Errorf("wrong log text inside: %s", f.Name())
-			}
+	for fileName, _ := range mFileName {
+		b, err := os.ReadFile(path.Join(extraPath, fileName))
+		if err != nil {
+			t.Errorf("failed to read file %s: %s", fileName, err.Error())
 		}
-	}
 
-	for k, v := range mFileName {
-		if v != true {
-			t.Errorf("no such file: %s", k)
+		if !strings.Contains(string(b), logText) {
+			t.Errorf("wrong log text inside: %s", fileName)
 		}
+
 	}
 }

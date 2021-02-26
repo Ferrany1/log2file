@@ -18,7 +18,7 @@ func TestExampleEmptyOptions(t *testing.T) {
 		ExampleEmptyOptions()
 	}
 
-	fi, dir, err := directory.ReadCurrentDirectory()
+	fi, dir, err := directory.ReadDirectory("./")
 	if err != nil {
 		t.Errorf("failed to read dir: %s", err.Error())
 	}

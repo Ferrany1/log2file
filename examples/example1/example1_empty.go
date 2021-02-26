@@ -9,9 +9,9 @@ func ExampleEmptyOptions() {
 	// Gets standard logfile Options
 	li := log2file.GetOptions()
 	// Inits logfile in current dict
-	logger, err := li.Logger()
+	logger, err := li.NewLogger()
 	if err != nil {
-		log.Println(err)
+		log.Fatalln(err)
 	}
 	// Writes log into main file
 	logger.Println("test")

@@ -1,27 +1,31 @@
 package log2file
 
 import (
-	"fmt"
 	"github.com/Ferrany1/log2file/src/directory"
-	"github.com/gin-gonic/gin"
 	"io/fs"
 	"log"
 	"os"
 	"path"
 	"reflect"
-	"strconv"
 	"time"
 )
 
 // Standard names for log files
-var (
-	standOptions = &fileOptions{fiNames: fileNames{logMain: "log_1", logBackup: "log_2", logExtension: "log"}, router: logRouter{port: 40013}}
-)
+var standOptions = &fileOptions{
+	fiPath:  filesPath{mainFilePath: "./", backupFilePath: "./"},
+	fiNames: fileNames{logMain: "log_1", logBackup: "log_2", logExtension: "log"},
+	router:  logRouter{port: 40013}}
 
 // LogFileOptions struct
 type fileOptions struct {
+	fiPath  filesPath
 	fiNames fileNames
 	router  logRouter
+}
+
+type filesPath struct {
+	mainFilePath   string
+	backupFilePath string
 }
 
 // LogFileOptions Names params
@@ -41,15 +45,23 @@ func GetOptions() *fileOptions {
 	return standOptions
 }
 
+// Changes filesPath
+func (c *fileOptions) ChangeOptionsPath(newMainPath, newBackupPath string) {
+	c.fiPath = filesPath{mainFilePath: newMainPath, backupFilePath: newBackupPath}
+}
+
 // Changes fileNames for (logMain, logBackup, logExtension string) LogFileOptions element
-func (c *fileOptions) ChangeOptionsNames(nMainFile, nBackupFile, nExtensionFile string, port int, routerStatus bool) *fileOptions {
-	c.fiNames = fileNames{logMain: nMainFile, logBackup: nBackupFile, logExtension: nExtensionFile}
-	c.router = logRouter{port: port, workStatus: routerStatus}
-	return c
+func (c *fileOptions) ChangeOptionsNames(newMainFileName, newBackupFileName, newExtensionFileName string) {
+	c.fiNames = fileNames{logMain: newMainFileName, logBackup: newBackupFileName, logExtension: newExtensionFileName}
+}
+
+// Changes router options
+func (c *fileOptions) ChangeOptionsRouter(newPort int, updateRouterStatus bool) {
+	c.router = logRouter{port: newPort, workStatus: updateRouterStatus}
 }
 
 // Logger Instance creation that will write new logs to logMain file
-func (c *fileOptions) Logger() (*log.Logger, error) {
+func (c *fileOptions) NewLogger() (*log.Logger, error) {
 	if reflect.ValueOf(*c).IsZero() {
 		c = standOptions
 	}
@@ -74,14 +86,21 @@ func (c *fileOptions) Logger() (*log.Logger, error) {
 
 // Creates main log file and renames previous if it was present in directory
 func (c *fileOptions) createLogFile() (string, error) {
-	fi, dir, err := directory.ReadCurrentDirectory()
+	info, err := os.Stat(c.fiPath.mainFilePath)
+	if err != nil || !info.IsDir() {
+		if err := os.MkdirAll(c.fiPath.mainFilePath, 0755); err != nil {
+			log.Fatalf("%v", err)
+		}
+	}
+
+	fi, _, err := directory.ReadDirectory(c.fiPath.mainFilePath)
 	if err != nil {
 		return "", err
 	}
 
 	var (
-		mainPath   = path.Join(dir, c.fiNames.logMain+"."+c.fiNames.logExtension)
-		BackupPath = path.Join(dir, c.fiNames.logBackup+"."+c.fiNames.logExtension)
+		mainPath   = path.Join(c.fiPath.mainFilePath, c.fiNames.logMain+"."+c.fiNames.logExtension)
+		BackupPath = path.Join(c.fiPath.backupFilePath, c.fiNames.logBackup+"."+c.fiNames.logExtension)
 	)
 
 	if c.findLogFile(fi) {
@@ -90,6 +109,7 @@ func (c *fileOptions) createLogFile() (string, error) {
 			return "", err
 		}
 	}
+
 	_, err = os.Create(mainPath)
 	if err != nil {
 		return "", err
@@ -111,26 +131,4 @@ func (c *fileOptions) findLogFile(fi []fs.DirEntry) (ok bool) {
 		}
 	}
 	return
-}
-
-// Starts a router with paths to logfiles
-func router() {
-	gin.SetMode(gin.ReleaseMode)
-	r := gin.New()
-
-	lg := r.Group("/logs")
-	lg.GET("/log_m", getLog1)
-	lg.GET("/log_b", getLog2)
-
-	log.Println(r.Run(":" + strconv.Itoa(standOptions.router.port)))
-}
-
-// Handler for main log file
-func getLog1(c *gin.Context) {
-	c.File(fmt.Sprintf("./%s.%s", standOptions.fiNames.logMain, standOptions.fiNames.logExtension))
-}
-
-// Handler for backup log file
-func getLog2(c *gin.Context) {
-	c.File(fmt.Sprintf("./%s.%s", standOptions.fiNames.logBackup, standOptions.fiNames.logExtension))
 }

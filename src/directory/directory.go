@@ -1,7 +1,6 @@
 package directory
 
 import (
-	"errors"
 	"fmt"
 	"io/fs"
 	"os"
@@ -10,19 +9,19 @@ import (
 )
 
 // Reads current directory
-func ReadCurrentDirectory() (fi []fs.DirEntry, dir string, err error) {
-	dir, err = filepath.Abs(filepath.Dir(os.Args[0]))
+func ReadDirectory(dirPath string) (fi []fs.DirEntry, dir string, err error) {
+	dir, err = filepath.Abs(filepath.Join(filepath.Dir(os.Args[0]), dirPath))
 	if err != nil {
-		return fi, "", errors.New(fmt.Sprintf("failed to get dir path. %s", err.Error()))
+		return fi, "", fmt.Errorf("failed to get dir path: %v", err)
 	}
 	// Checks if executed by go run
 	if strings.Contains(dir, "go-build") {
-		dir = "."
+		dir = dirPath
 	}
 
 	fi, err = os.ReadDir(dir)
 	if err != nil {
-		return nil, "", errors.New(fmt.Sprintf("failed read dir. %s", err.Error()))
+		return nil, "", fmt.Errorf("failed read dir: %v", err)
 	}
 
 	return
