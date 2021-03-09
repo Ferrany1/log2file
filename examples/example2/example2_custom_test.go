@@ -11,7 +11,7 @@ import (
 func TestExampleCustomOptions(t *testing.T) {
 	var (
 		mFileName = map[string]bool{"log_main.log": false, "log_backup.log": false}
-		logText   = "test"
+		logText   = "Message:test"
 		extraPath = "./testDir"
 	)
 
